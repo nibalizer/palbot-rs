@@ -5,7 +5,6 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use reqwest;
-//use std::error::Error;
 
 struct Handler;
 use serde_derive::Deserialize;
@@ -86,20 +85,16 @@ impl EventHandler for Handler {
         }
         if msg.content.starts_with("!pal") {
             // Pal lookup
-            //
+
             let pal = msg.content.split(" ").nth(1).unwrap();
-            //let pal = "abcd";
-            //println!("{}", msg.content.split(" "));
 
             println!("Pal name: {pal}");
-            // The URL of the paldb api
+            // The URL of the paldb api + pal name
             let url = format!("http://localhost:8080/?name={}", pal);
             println!("url: {url}");
 
             // Send a GET request to the specified URL
             let response = reqwest::get(url).await.unwrap();
-            //println!("Response: {response}");
-            //println!("Success! {}", response.text().await.unwrap());
             let mut output = String::from("temp");
 
             match response.status() {
@@ -119,12 +114,9 @@ impl EventHandler for Handler {
             };
 
 
-            //Ok(())
-            //
             // Sending a message can fail, due to a network error, an authentication error, or lack
             // of permissions to post in the channel, so log to stdout when some error happens,
             // with a description of it.
-            //let output = format!("Pal: {}, Suitabilities {}",pal, type_fields); 
             if let Err(why) = msg.channel_id.say(&ctx.http, output).await {
                 println!("Error sending message: {why:?}");
             }
