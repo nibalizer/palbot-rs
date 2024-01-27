@@ -124,6 +124,44 @@ impl EventHandler for Handler {
                 println!("Error sending message: {why:?}");
             }
         }
+        if msg.content.starts_with("!pic") {
+            // Pal lookup
+
+            let pal = msg.content.split(" ").nth(1).unwrap();
+
+            println!("Pal name: {pal}");
+            // The URL of the paldb api + pal name
+            let url = format!("{}?name={}", palapiurl, pal);
+            println!("url: {url}");
+
+            // Send a GET request to the specified URL
+            let response = reqwest::get(url).await.unwrap();
+            let mut output = String::from("temp");
+
+            match response.status() {
+                reqwest::StatusCode::OK => {
+                    // on success, parse our JSON to an APIResponse
+                    match response.json::<APIResponse>().await {
+                        Ok(parsed) => output = format!("{} {}", parsed.content[0].image_wiki, pal),
+                        Err(_) => println!("Hm, the response didn't match the shape we expected."),
+                    };
+                }
+                reqwest::StatusCode::UNAUTHORIZED => {
+                    println!("Need to grab a new token");
+                }
+                other => {
+                    panic!("Uh oh! Something unexpected happened: {:?}", other);
+                }
+            };
+
+
+            // Sending a message can fail, due to a network error, an authentication error, or lack
+            // of permissions to post in the channel, so log to stdout when some error happens,
+            // with a description of it.
+            if let Err(why) = msg.channel_id.say(&ctx.http, output).await {
+                println!("Error sending message: {why:?}");
+            }
+        }
     }
 
     // Set a handler to be called on the `ready` event. This is called when a shard is booted, and
