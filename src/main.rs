@@ -74,7 +74,10 @@ impl EventHandler for Handler {
     //
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched
     // simultaneously.
+
     async fn message(&self, ctx: Context, msg: Message) {
+        // pull api url from env
+        let palapiurl  = env::var("PAL_API_URL").expect("Expected a PAL_API_URL in the environment");
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an authentication error, or lack
             // of permissions to post in the channel, so log to stdout when some error happens,
@@ -90,7 +93,7 @@ impl EventHandler for Handler {
 
             println!("Pal name: {pal}");
             // The URL of the paldb api + pal name
-            let url = format!("http://localhost:8080/?name={}", pal);
+            let url = format!("{}?name={}", palapiurl, pal);
             println!("url: {url}");
 
             // Send a GET request to the specified URL
