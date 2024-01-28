@@ -1,5 +1,5 @@
 # build
-FROM rust:buster as builder
+FROM rust:bookworm as builder
 
 RUN mkdir -p /src/app
 
@@ -12,10 +12,10 @@ COPY src src
 RUN cargo build --release
 
 # package
-FROM alpine:latest
+FROM debian:bookworm
 
-RUN apk --no-cache add ca-certificates
+RUN apt-get update && apt-get install -y libssl3
 
-COPY --from=builder /src/app/target/release/palbot /usr/local/bin/palbot
+COPY --from=builder /src/app/target/release/palbot /bin/palbot
 
-ENTRYPOINT ["/usr/local/bin/palbot"]
+CMD ["/bin/palbot"]

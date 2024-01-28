@@ -1,3 +1,4 @@
 /target
 deploy.sh
 *.tar.gz
+*.tar
