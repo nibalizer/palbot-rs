@@ -14,7 +14,8 @@ RUN cargo build --release
 # package
 FROM debian:bookworm
 
-RUN apt-get update && apt-get install -y libssl3
+RUN apt-get update && apt-get install -y libssl3 ca-certificates
+RUN update-ca-certificates
 
 COPY --from=builder /src/app/target/release/palbot /bin/palbot
 
